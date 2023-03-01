@@ -6,7 +6,7 @@
 /*   By: chales <chales@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 13:39:03 by chales            #+#    #+#             */
-/*   Updated: 2023/02/28 19:15:02 by chales           ###   ########.fr       */
+/*   Updated: 2023/03/01 20:31:22 by chales           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,27 +18,37 @@
 
 void	handler(int signal)
 {
-	static char	c;
-	static int	bit;
+	static int		bit;
+	static char		c;
 
-	c |= (signal == SIGUSR1) << bit;
+	if (!signal)
+		exit(EXIT_FAILURE);
+	if (signal == SIGUSR1)
+		c |= 1 << bit;
+	else
+		c |= 0 << bit;
 	if (bit == 7)
 	{
-		ft_printf("%c", c);
+		write(1, &c, 1);
+		c = 0;
 		bit = 0;
+		bit--;
 	}
 	bit++;
+	usleep(100);
 }
 
 int	main(void)
 {
-	pid_t	pid;
+	pid_t						pid;
+	static struct	sigaction	sa;
 
 	pid = getpid();
 	ft_printf("PID : %d\n", pid);
-	signal(SIGUSR1, handler);
-	signal(SIGUSR2, handler);
+	sa.sa_handler = &handler;
+	sigaction(SIGUSR1, &sa, NULL);
+	sigaction(SIGUSR2, &sa, NULL);
 	while (1)
 		pause();
-	return (EXIT_FAILURE);
+	return (0);
 }

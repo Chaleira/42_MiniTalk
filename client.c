@@ -6,7 +6,7 @@
 /*   By: chales <chales@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 12:20:41 by chales            #+#    #+#             */
-/*   Updated: 2023/02/28 16:58:05 by chales           ###   ########.fr       */
+/*   Updated: 2023/03/01 20:29:23 by chales           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@ void	sender(char c, pid_t pid)
 {
 	int	i;
 
-	i = 7;
-	while (i >= 0)
+	i = 0;
+	while (i <= 7)
 	{
 		if (c & (1 << i))
 		{
@@ -39,25 +39,29 @@ void	sender(char c, pid_t pid)
 				exit(EXIT_FAILURE);
 			}
 		}
-		i--;
+		i++;
+		usleep(200);
 	}
 }
 
 int main(int ac, char	*av[])
 {
 	pid_t	pid;
-	int		j;
-	char	*str;
+	int		count;
 	
-	j = 0;
-	if (ac != 3)
-		return (0);
-	pid = ft_atoi(av[1]);
-	str = ft_strdup(av[2]);
-	while (str && str[j] != '\0')
-	{
-		sender(str[j], pid);
-		j++;
+	count = 0;
+	if (ac == 3)
+	{	
+		pid = ft_atoi(av[1]);
+		while (av[2] && av[2][count] != '\0')
+		{
+			sender(av[2][count], pid);
+			++count;
+		}
 	}
-	return (0);
+	else
+	{
+		ft_printf("Usage : ./client <pid> <msg>\n");
+		exit(EXIT_FAILURE);
+	}
 }
