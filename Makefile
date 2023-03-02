@@ -6,7 +6,7 @@
 #    By: chales <chales@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/27 13:52:31 by chales            #+#    #+#              #
-#    Updated: 2023/02/27 14:14:01 by chales           ###   ########.fr        #
+#    Updated: 2023/03/02 18:10:48 by chales           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,28 +16,31 @@ CLIENT = client
 
 LIBFT = libft/libft.a
 
-SEREVR_SRC = server.c
-
+SERVER_SRC = server.c
 CLIENT_SRC = client.c
+
+SERVER_OBJ = server.o
+CLIENT_OBJ = client.o
 
 CFLAGS =
 
 RM = rm -fr
 
-all : $(SERVER) $(CLIENT)
+all : $(SERVER) $(CLIENT) 
 
-$(SERVER):		$(SEREVR_SRC)
+$(SERVER):		$(SERVER_OBJ)
 				@make -s -C libft
-				@gcc $(CFLAGS) $(SEREVR_SRC) $(LIBFT) -o $(SERVER)
+				@gcc $(CFLAGS) $(SERVER_OBJ) $(LIBFT) -o $(SERVER)
 
-$(CLIENT):		$(CLIENT_SRC)
+$(CLIENT):		$(CLIENT_OBJ)
 				@make -s -C libft
-				@gcc $(CFLAGS) $(CLIENT_SRC) $(LIBFT) -o $(CLIENT)
+				@gcc $(CFLAGS) $(CLIENT_OBJ) $(LIBFT) -o $(CLIENT)
 
 clean:			
 				@make clean -s -C libft
+				@$(RM) $(SERVER_OBJ) $(CLIENT_OBJ)
 
-fclean:			
+fclean:			clean
 				@make fclean -s -C libft
 				@$(RM) $(SERVER) $(CLIENT)
 

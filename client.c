@@ -6,14 +6,12 @@
 /*   By: chales <chales@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 12:20:41 by chales            #+#    #+#             */
-/*   Updated: 2023/03/02 16:12:01 by chales           ###   ########.fr       */
+/*   Updated: 2023/03/02 17:58:09 by chales           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
 #include <signal.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include "libft/libft.h"
 
 void	s_error(void)
@@ -29,7 +27,7 @@ void	confirm_receive(int signal)
 	if (signal == SIGUSR1)
 	{
 		ft_printf("Success, message sent!\n");
-		exit(EXIT_FAILURE);
+		exit(EXIT_SUCCESS);
 	}
 	if (signal == SIGUSR2)
 		sent++;
