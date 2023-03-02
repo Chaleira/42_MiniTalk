@@ -6,7 +6,7 @@
 /*   By: chales <chales@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 12:20:41 by chales            #+#    #+#             */
-/*   Updated: 2023/03/01 20:29:23 by chales           ###   ########.fr       */
+/*   Updated: 2023/03/02 16:12:01 by chales           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,28 @@
 #include <stdio.h>
 #include "libft/libft.h"
 
+void	s_error(void)
+{
+	ft_printf("Error!\n");
+	exit(EXIT_FAILURE);
+}
+
+void	confirm_receive(int signal)
+{
+	static int	sent;
+
+	if (signal == SIGUSR1)
+	{
+		ft_printf("Success, message sent!\n");
+		exit(EXIT_FAILURE);
+	}
+	if (signal == SIGUSR2)
+		sent++;
+}
+
 void	sender(char c, pid_t pid)
 {
-	int	i;
+	int				i;
 
 	i = 0;
 	while (i <= 7)
@@ -26,38 +45,35 @@ void	sender(char c, pid_t pid)
 		if (c & (1 << i))
 		{
 			if (kill(pid, SIGUSR1) == -1)
-			{
-				ft_printf("Error!\n");
-				exit(EXIT_FAILURE);
-			}
+				s_error();
 		}
 		else
 		{
 			if (kill(pid, SIGUSR2) == -1)
-			{
-				ft_printf("Error!\n");			
-				exit(EXIT_FAILURE);
-			}
+				s_error();
 		}
 		i++;
-		usleep(200);
+		usleep(500);
 	}
 }
 
-int main(int ac, char	*av[])
+int	main(int ac, char	*av[])
 {
-	pid_t	pid;
+	pid_t	server_pid;
 	int		count;
-	
-	count = 0;
+
 	if (ac == 3)
-	{	
-		pid = ft_atoi(av[1]);
+	{
+		signal(SIGUSR1, confirm_receive);
+		signal(SIGUSR2, confirm_receive);
+		server_pid = ft_atoi(av[1]);
+		count = 0;
 		while (av[2] && av[2][count] != '\0')
 		{
-			sender(av[2][count], pid);
+			sender(av[2][count], server_pid);
 			++count;
 		}
+		sender('\0', server_pid);
 	}
 	else
 	{
