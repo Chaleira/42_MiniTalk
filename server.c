@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chales <chales@student.42.fr>              +#+  +:+       +#+        */
+/*   By: plopes-c <plopes-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 13:39:03 by chales            #+#    #+#             */
-/*   Updated: 2023/03/02 16:12:26 by chales           ###   ########.fr       */
+/*   Updated: 2023/03/02 16:58:02 by plopes-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,17 +72,19 @@ void	handler(int signal, siginfo_t *info, void *context)
 
 int	main(void)
 {
-	pid_t				pid;
-	struct sigaction	sa;
+	pid_t					pid;
+	static struct sigaction	sa;
 
 	pid = getpid();
 	ft_printf("PID : %d\n", pid);
 	sa.sa_sigaction = handler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_SIGINFO;
 	while (1)
 	{
 		sigaction(SIGUSR1, &sa, 0);
 		sigaction(SIGUSR2, &sa, 0);
 		pause();
 	}
-	return (0);
+	return (EXIT_FAILURE);
 }
