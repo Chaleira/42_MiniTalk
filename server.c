@@ -6,7 +6,7 @@
 /*   By: chales <chales@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 13:39:03 by chales            #+#    #+#             */
-/*   Updated: 2023/03/02 17:58:18 by chales           ###   ########.fr       */
+/*   Updated: 2023/03/03 09:55:20 by chales           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,6 @@ void	handler(int signal, siginfo_t *info, void *context)
 		{
 			if (kill(client_pid, SIGUSR1) == -1)
 				s_error();
-			c = 0;
 		}
 		c = 0;
 		bit = 0;
