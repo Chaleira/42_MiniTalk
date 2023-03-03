@@ -6,7 +6,7 @@
 #    By: chales <chales@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/27 13:52:31 by chales            #+#    #+#              #
-#    Updated: 2023/03/02 18:10:48 by chales           ###   ########.fr        #
+#    Updated: 2023/03/03 14:43:48 by chales           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,7 @@ CLIENT_SRC = client.c
 SERVER_OBJ = server.o
 CLIENT_OBJ = client.o
 
-CFLAGS =
+CFLAGS = -Wall -Wextra -Werror
 
 RM = rm -fr
 
