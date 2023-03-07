@@ -6,7 +6,7 @@
 /*   By: plopes-c <plopes-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 12:20:41 by chales            #+#    #+#             */
-/*   Updated: 2023/03/07 18:53:12 by plopes-c         ###   ########.fr       */
+/*   Updated: 2023/03/07 20:32:31 by plopes-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,9 @@
 #include <stdio.h>
 #include "libft/libft.h"
 
-void	s_error(void)
+void	error_msg(void)
 {
-	ft_printf("Error!\n");
+	write(1, "Error!\n", 7);
 	exit(EXIT_FAILURE);
 }
 
@@ -29,7 +29,7 @@ void	confirm_receive(int signal, siginfo_t *info, void *context)
 	(void)info;
 	if (signal == SIGUSR1)
 	{
-		ft_putstr("Success, message sent!\n");
+		write(1, "Success, message sent!\n", 23);
 		exit(EXIT_SUCCESS);
 	}
 	if (signal == SIGUSR2)
@@ -46,16 +46,17 @@ void	sender(char c, pid_t pid)
 		if (c & (1 << i))
 		{
 			if (kill(pid, SIGUSR1) == -1)
-				s_error();
+				error_msg();
 		}
 		else
 		{
 			if (kill(pid, SIGUSR2) == -1)
-				s_error();
+				error_msg();
 		}
 		i++;
-		usleep(50);
+		usleep(100);
 	}
+	usleep(150);
 }
 
 void	send_count(int count, pid_t pid)
@@ -68,17 +69,17 @@ void	send_count(int count, pid_t pid)
 		if (count & (1 << i))
 		{
 			if (kill(pid, SIGUSR1) == -1)
-				s_error();
+				error_msg();
 		}
 		else
 		{
 			if (kill(pid, SIGUSR2) == -1)
-				s_error();
+				error_msg();
 		}
 		i++;
-		usleep(50);
+		usleep(100);
 	}
-	usleep(50);
+	usleep(150);
 }
 
 int	main(int ac, char	*av[])
