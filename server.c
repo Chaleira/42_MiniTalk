@@ -6,13 +6,18 @@
 /*   By: chales <chales@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 13:39:03 by chales            #+#    #+#             */
-/*   Updated: 2023/03/03 10:29:18 by chales           ###   ########.fr       */
+/*   Updated: 2023/03/07 16:38:57 by chales           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
 #include <signal.h>
+#include <stdio.h>
 #include "libft/libft.h"
+
+void	handler(int signal, siginfo_t *info, void *context);
+
+static char	*g_string;
 
 void	s_error(void)
 {
@@ -20,7 +25,7 @@ void	s_error(void)
 	exit(EXIT_FAILURE);
 }
 
-int	client(int signal, siginfo_t *info, int *bit, char *c)
+int	client(int signal, siginfo_t *info, int *bit)
 {
 	static int	current_pid;
 	static int	client_pid;
@@ -34,37 +39,66 @@ int	client(int signal, siginfo_t *info, int *bit, char *c)
 	{
 		client_pid = current_pid;
 		*bit = 0;
-		*c = 0;
 	}
 	return (client_pid);
 }
 
-void	handler(int signal, siginfo_t *info, void *context)
+void	createstring(int signal, siginfo_t *info, void *context)
 {
-	static int		bit;
-	static char		c;
-	int				client_pid;
+	static int			bit;
+	static int			count;
+	struct sigaction	sa;
 
 	(void)context;
-	client_pid = client(signal, info, &bit, &c);
 	if (signal == SIGUSR1)
-		c |= 1 << bit;
+		count |= 1 << bit;
 	else
-		c |= 0 << bit;
+		count |= 0 << bit;
+	bit++;
+	if (bit == 32)
+	{
+		g_string = ft_calloc(count + 1, sizeof(char));
+		if (!g_string)
+			return ;
+		sa.sa_sigaction = handler;
+		sigaction(SIGUSR1, &sa, 0);
+		sigaction(SIGUSR2, &sa, 0);
+		bit = 0;
+		count = 0;
+	}
+	else
+		kill(info->si_pid, SIGUSR2);
+}
+
+void	handler(int signal, siginfo_t *info, void *context)
+{
+	static int			bit;
+	static int			i;
+	struct sigaction	sa;
+
+	(void)context;
+	if (signal == SIGUSR1)
+		g_string[i] |= 1 << bit;
+	else
+		g_string[i] |= 0 << bit;
 	bit++;
 	if (bit == 8)
 	{
-		write(1, &c, 1);
-		if (c == '\0')
+		if (g_string[i] == '\0')
 		{
-			if (kill(client_pid, SIGUSR1) == -1)
-				s_error();
+			ft_putstr(g_string);
+			free(g_string);
+			kill(info->si_pid, SIGUSR1);
+			sa.sa_sigaction = createstring;
+			sigaction(SIGUSR1, &sa, 0);
+			sigaction(SIGUSR2, &sa, 0);
+			i = -1;
 		}
-		c = 0;
 		bit = 0;
+		i++;
 	}
-	usleep(200);
-	kill(client_pid, SIGUSR2);
+	else
+		kill(info->si_pid, SIGUSR2);
 }
 
 int	main(void)
@@ -74,12 +108,12 @@ int	main(void)
 
 	pid = getpid();
 	ft_printf("PID : %d\n", pid);
-	sa.sa_sigaction = handler;
+	sa.sa_sigaction = createstring;
+	sigaction(SIGUSR1, &sa, 0);
+	sigaction(SIGUSR2, &sa, 0);
 	while (1)
-	{
-		sigaction(SIGUSR1, &sa, 0);
-		sigaction(SIGUSR2, &sa, 0);
 		pause();
-	}
 	return (0);
 }
+
+// asbdcasbdcasbdcasbdcasbdcasbdcasbdcasbdcasbdcasbda
