@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chales <chales@student.42.fr>              +#+  +:+       +#+        */
+/*   By: plopes-c <plopes-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 13:39:03 by chales            #+#    #+#             */
-/*   Updated: 2023/03/07 16:38:57 by chales           ###   ########.fr       */
+/*   Updated: 2023/03/07 18:49:41 by plopes-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	s_error(void)
 	exit(EXIT_FAILURE);
 }
 
-int	client(int signal, siginfo_t *info, int *bit)
+int	client(int signal, siginfo_t *info, int *bit, void *s)
 {
 	static int	current_pid;
 	static int	client_pid;
@@ -39,6 +39,7 @@ int	client(int signal, siginfo_t *info, int *bit)
 	{
 		client_pid = current_pid;
 		*bit = 0;
+		s = 0;
 	}
 	return (client_pid);
 }
@@ -50,6 +51,7 @@ void	createstring(int signal, siginfo_t *info, void *context)
 	struct sigaction	sa;
 
 	(void)context;
+	client(signal, info, &bit, &count);
 	if (signal == SIGUSR1)
 		count |= 1 << bit;
 	else
@@ -61,6 +63,7 @@ void	createstring(int signal, siginfo_t *info, void *context)
 		if (!g_string)
 			return ;
 		sa.sa_sigaction = handler;
+		sa.sa_flags = SA_SIGINFO;
 		sigaction(SIGUSR1, &sa, 0);
 		sigaction(SIGUSR2, &sa, 0);
 		bit = 0;
@@ -77,6 +80,7 @@ void	handler(int signal, siginfo_t *info, void *context)
 	struct sigaction	sa;
 
 	(void)context;
+	client(signal, info, &bit, g_string);
 	if (signal == SIGUSR1)
 		g_string[i] |= 1 << bit;
 	else
@@ -88,8 +92,10 @@ void	handler(int signal, siginfo_t *info, void *context)
 		{
 			ft_putstr(g_string);
 			free(g_string);
-			kill(info->si_pid, SIGUSR1);
+			if (kill(info->si_pid, SIGUSR1) == -1)
+				s_error();
 			sa.sa_sigaction = createstring;
+			sa.sa_flags = SA_SIGINFO;
 			sigaction(SIGUSR1, &sa, 0);
 			sigaction(SIGUSR2, &sa, 0);
 			i = -1;
@@ -109,6 +115,7 @@ int	main(void)
 	pid = getpid();
 	ft_printf("PID : %d\n", pid);
 	sa.sa_sigaction = createstring;
+	sa.sa_flags = SA_SIGINFO;
 	sigaction(SIGUSR1, &sa, 0);
 	sigaction(SIGUSR2, &sa, 0);
 	while (1)

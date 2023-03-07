@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: chales <chales@student.42.fr>              +#+  +:+       +#+         #
+#    By: plopes-c <plopes-c@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/27 13:52:31 by chales            #+#    #+#              #
-#    Updated: 2023/03/03 14:43:48 by chales           ###   ########.fr        #
+#    Updated: 2023/03/07 17:48:29 by plopes-c         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,7 @@ CLIENT_SRC = client.c
 SERVER_OBJ = server.o
 CLIENT_OBJ = client.o
 
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -fPIE
 
 RM = rm -fr
 

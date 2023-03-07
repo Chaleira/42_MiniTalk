@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chales <chales@student.42.fr>              +#+  +:+       +#+        */
+/*   By: plopes-c <plopes-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 12:20:41 by chales            #+#    #+#             */
-/*   Updated: 2023/03/07 16:42:33 by chales           ###   ########.fr       */
+/*   Updated: 2023/03/07 18:53:12 by plopes-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ void	sender(char c, pid_t pid)
 				s_error();
 		}
 		i++;
-		usleep(100);
+		usleep(50);
 	}
 }
 
@@ -76,8 +76,9 @@ void	send_count(int count, pid_t pid)
 				s_error();
 		}
 		i++;
-		usleep(100);
+		usleep(50);
 	}
+	usleep(50);
 }
 
 int	main(int ac, char	*av[])
@@ -86,17 +87,18 @@ int	main(int ac, char	*av[])
 	int					count;
 	struct sigaction	sa;
 
+	count = 0;
 	if (ac != 3)
 	{
 		ft_putstr("Usage : ./client <pid> <msg>\n");
 		exit(EXIT_FAILURE);
 	}
 	sa.sa_sigaction = confirm_receive;
+	sa.sa_flags = SA_SIGINFO;
 	sigaction(SIGUSR1, &sa, 0);
 	sigaction(SIGUSR2, &sa, 0);
 	server_pid = ft_atoi(av[1]);
 	send_count(ft_strlen(av[2]), server_pid);
-	count = 0;
 	while (av[2] && av[2][count] != '\0')
 	{
 		sender(av[2][count], server_pid);
