@@ -6,7 +6,7 @@
 /*   By: plopes-c <plopes-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 13:39:03 by chales            #+#    #+#             */
-/*   Updated: 2023/03/07 20:38:41 by plopes-c         ###   ########.fr       */
+/*   Updated: 2023/03/08 20:44:11 by plopes-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,13 @@ typedef struct s_var
 	int					len;
 	int					i;
 	struct sigaction	sa;
+	int					client_pid;
 }				t_var;
 
 static t_var			g_var;
 
 void	handler(int signal, siginfo_t *info, void *context);
+void	createstring(int signal, siginfo_t *info, void *context);
 
 void	set_handler(void (*handler)(int signal, siginfo_t *info, void *context))
 {
@@ -35,25 +37,25 @@ void	set_handler(void (*handler)(int signal, siginfo_t *info, void *context))
 	sigaction(SIGUSR2, &g_var.sa, 0);
 }
 
-void	client(int signal, siginfo_t *info, int *bit, void *s)
+int	client(int signal, siginfo_t *info)
 {
 	static int	current_pid;
-	static int	client_pid;
 
 	if (!signal)
 	{
-		write(1, "Error!\n", 7);
+		write(1, "Error!Sig\n", 10);
 		exit(EXIT_FAILURE);
 	}
-	if (!client_pid)
-		client_pid = info->si_pid;
+	if (!g_var.client_pid)
+		g_var.client_pid = info->si_pid;
 	current_pid = info->si_pid;
-	if (client_pid != current_pid)
+	if (g_var.client_pid != current_pid)
 	{
-		client_pid = current_pid;
-		*bit = 0;
-		s = 0;
+		kill(current_pid, SIGUSR2);
+		g_var.client_pid = 0;
+		return (0);
 	}
+	return (1);
 }
 
 void	createstring(int signal, siginfo_t *info, void *context)
@@ -62,7 +64,7 @@ void	createstring(int signal, siginfo_t *info, void *context)
 	static int			count;
 
 	(void)context;
-	client(signal, info, &bit, &count);
+	(void)info;
 	if (signal == SIGUSR1)
 		count |= 1 << bit;
 	else
@@ -70,16 +72,18 @@ void	createstring(int signal, siginfo_t *info, void *context)
 	bit++;
 	if (bit == 32)
 	{
-		g_var.g_string = ft_calloc(count + 1, sizeof(char));
+		g_var.g_string = ft_calloc((count + 1), sizeof(char));
 		if (!g_var.g_string)
-			return ;
+		{
+			free(g_var.g_string);
+			write(1, "Error!Malloc\n", 13);
+			exit(EXIT_FAILURE);
+		}
 		set_handler(handler);
 		bit = 0;
 		g_var.len = count;
 		count = 0;
 	}
-	else
-		kill(info->si_pid, SIGUSR2);
 }
 
 void	handler(int signal, siginfo_t *info, void *context)
@@ -87,7 +91,8 @@ void	handler(int signal, siginfo_t *info, void *context)
 	static int	bit;
 
 	(void)context;
-	client(signal, info, &bit, g_var.g_string);
+	if (!client(signal, info))
+		return ;
 	if (signal == SIGUSR1)
 		g_var.g_string[g_var.i] |= 1 << bit;
 	else
@@ -99,15 +104,16 @@ void	handler(int signal, siginfo_t *info, void *context)
 		{
 			write(1, g_var.g_string, g_var.len);
 			free(g_var.g_string);
-			kill(info->si_pid, SIGUSR1);
+			g_var.client_pid = 0;
 			set_handler(createstring);
-			g_var.i = -1;
+			kill(info->si_pid, SIGUSR1);
+			g_var.i = 0;
+			bit = 0;
+			return ;
 		}
 		bit = 0;
 		g_var.i++;
 	}
-	else
-		kill(info->si_pid, SIGUSR2);
 }
 
 int	main(void)

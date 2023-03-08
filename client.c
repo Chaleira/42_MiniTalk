@@ -6,7 +6,7 @@
 /*   By: plopes-c <plopes-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 12:20:41 by chales            #+#    #+#             */
-/*   Updated: 2023/03/07 20:32:31 by plopes-c         ###   ########.fr       */
+/*   Updated: 2023/03/08 20:53:17 by plopes-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 
 void	error_msg(void)
 {
-	write(1, "Error!\n", 7);
+	write(1, "Error!Sending Signal\n", 21);
 	exit(EXIT_FAILURE);
 }
 
@@ -33,7 +33,11 @@ void	confirm_receive(int signal, siginfo_t *info, void *context)
 		exit(EXIT_SUCCESS);
 	}
 	if (signal == SIGUSR2)
+	{
+		write(1, "SigError! Received\n", 19);
+		exit(EXIT_FAILURE);
 		sent++;
+	}
 }
 
 void	sender(char c, pid_t pid)
@@ -54,9 +58,9 @@ void	sender(char c, pid_t pid)
 				error_msg();
 		}
 		i++;
-		usleep(100);
+		usleep(250);
 	}
-	usleep(150);
+	usleep(200);
 }
 
 void	send_count(int count, pid_t pid)
@@ -77,9 +81,9 @@ void	send_count(int count, pid_t pid)
 				error_msg();
 		}
 		i++;
-		usleep(100);
+		usleep(200);
 	}
-	usleep(150);
+	usleep(250);
 }
 
 int	main(int ac, char	*av[])
