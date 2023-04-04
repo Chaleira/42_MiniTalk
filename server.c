@@ -6,7 +6,7 @@
 /*   By: plopes-c <plopes-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 13:39:03 by chales            #+#    #+#             */
-/*   Updated: 2023/04/03 21:36:24 by plopes-c         ###   ########.fr       */
+/*   Updated: 2023/04/04 18:51:29 by plopes-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ void	createstring(int signal, siginfo_t *info, void *context)
 	bit++;
 	if (bit == 32)
 	{
-		g_var.g_string = ft_calloc((count + 1), sizeof(char));
+		g_var.g_string = malloc((count + 1) * sizeof(char));
 		if (!g_var.g_string)
 		{
 			write(1, "Error!Malloc\n", 13);
@@ -84,11 +84,10 @@ void	handler(int signal, siginfo_t *info, void *context)
 			set_handler(createstring);
 			kill(info->si_pid, SIGUSR1);
 			g_var.i = 0;
-			bit = 0;
-			return ;
 		}
+		else
+			g_var.i++;
 		bit = 0;
-		g_var.i++;
 	}
 	kill(info->si_pid, SIGUSR2);
 }
