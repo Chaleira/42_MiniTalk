@@ -6,7 +6,7 @@
 /*   By: plopes-c <plopes-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 13:39:03 by chales            #+#    #+#             */
-/*   Updated: 2023/04/04 18:51:29 by plopes-c         ###   ########.fr       */
+/*   Updated: 2023/04/13 21:31:04 by plopes-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,8 @@
 
 typedef struct s_var
 {
-	char				*g_string;
+	char				*string;
 	int					len;
-	int					i;
 	struct sigaction	sa;
 	int					client_pid;
 }				t_var;
@@ -46,13 +45,11 @@ void	createstring(int signal, siginfo_t *info, void *context)
 	(void)context;
 	if (signal == SIGUSR1)
 		count |= 1 << bit;
-	else
-		count |= 0 << bit;
 	bit++;
 	if (bit == 32)
 	{
-		g_var.g_string = malloc((count + 1) * sizeof(char));
-		if (!g_var.g_string)
+		g_var.string = ft_calloc((count + 1), sizeof(char));
+		if (!g_var.string)
 		{
 			write(1, "Error!Malloc\n", 13);
 			exit(EXIT_FAILURE);
@@ -68,25 +65,23 @@ void	createstring(int signal, siginfo_t *info, void *context)
 void	handler(int signal, siginfo_t *info, void *context)
 {
 	static int	bit;
+	static int	i;
 
 	(void)context;
 	if (signal == SIGUSR1)
-		g_var.g_string[g_var.i] |= 1 << bit;
-	else
-		g_var.g_string[g_var.i] |= 0 << bit;
+		g_var.string[i] |= 1 << bit;
 	bit++;
 	if (bit == 8)
 	{
-		if (g_var.g_string[g_var.i] == '\0')
+		i++;
+		if (i == g_var.len)
 		{
-			write(1, g_var.g_string, g_var.len);
-			free(g_var.g_string);
+			write(1, g_var.string, g_var.len);
+			free(g_var.string);
 			set_handler(createstring);
 			kill(info->si_pid, SIGUSR1);
-			g_var.i = 0;
+			i = 0;
 		}
-		else
-			g_var.i++;
 		bit = 0;
 	}
 	kill(info->si_pid, SIGUSR2);

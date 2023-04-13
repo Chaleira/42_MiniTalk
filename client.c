@@ -6,7 +6,7 @@
 /*   By: plopes-c <plopes-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 12:20:41 by chales            #+#    #+#             */
-/*   Updated: 2023/04/04 18:52:27 by plopes-c         ###   ########.fr       */
+/*   Updated: 2023/04/13 21:29:32 by plopes-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ void	send_count(int count, pid_t pid)
 				error_msg();
 		}
 		i++;
-		usleep(50000);
+		usleep(500000);
 	}
 }
 
@@ -99,5 +99,4 @@ int	main(int ac, char	*av[])
 		sender(av[2][count], server_pid);
 		++count;
 	}
-	sender('\0', server_pid);
 }
