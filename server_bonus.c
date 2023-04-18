@@ -6,7 +6,7 @@
 /*   By: plopes-c <plopes-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/14 18:20:13 by plopes-c          #+#    #+#             */
-/*   Updated: 2023/04/14 18:47:18 by plopes-c         ###   ########.fr       */
+/*   Updated: 2023/04/18 17:44:04 by plopes-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,22 +19,22 @@ typedef struct s_var
 {
 	char				*string;
 	int					len;
-	struct sigaction	sa;
 }				t_var;
 
 static t_var			g_var;
 
 void	handler(int signal, siginfo_t *info, void *context);
 void	createstring(int signal, siginfo_t *info, void *context);
-void	handler(int signal, siginfo_t *info, void *context);
 
 void	set_handler(void (*handler)(int signal, siginfo_t *info, void *context))
 {
-	g_var.sa.sa_sigaction = handler;
-	g_var.sa.sa_flags = SA_SIGINFO;
-	sigemptyset(&g_var.sa.sa_mask);
-	sigaction(SIGUSR1, &g_var.sa, 0);
-	sigaction(SIGUSR2, &g_var.sa, 0);
+	static struct sigaction	sa;
+
+	sa.sa_sigaction = handler;
+	sa.sa_flags = SA_SIGINFO;
+	sigemptyset(&sa.sa_mask);
+	sigaction(SIGUSR1, &sa, 0);
+	sigaction(SIGUSR2, &sa, 0);
 }
 
 void	createstring(int signal, siginfo_t *info, void *context)
